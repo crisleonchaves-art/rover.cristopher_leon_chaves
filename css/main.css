@@ -25,3 +25,10 @@ h1:hover {
   font-size: 3.5rem; /* El tamaño al que quieres que crezca */
 }
 
+h2 {
+  transition: font-size 0.3s ease; /* Hace que el cambio sea progresivo */
+}
+
+h2:hover {
+  font-size: 3.5rem; /* El tamaño al que quieres que crezca */
+}
