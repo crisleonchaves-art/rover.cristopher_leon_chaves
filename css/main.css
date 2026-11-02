@@ -56,3 +56,58 @@ h2:hover {
   cursor: pointer;    
   width: 100%;        
 }
+
+/* Estilos generales del menú */
+.menu-navegacion {
+  background-color: #2c3e50;
+  font-family: Arial, sans-serif;
+}
+
+.menu-navegacion ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+}
+
+.menu-navegacion li {
+  position: relative; /* Clave para posicionar el submenú respecto al elemento padre */
+}
+
+.menu-navegacion a {
+  display: block;
+  color: white;
+  padding: 15px 20px;
+  text-decoration: none;
+  transition: background 0.3s;
+}
+
+.menu-navegacion a:hover {
+  background-color: #34495e;
+}
+
+/* Ocultar el submenú por defecto */
+.menu-navegacion .submenu {
+  display: none;
+  position: absolute;
+  top: 100%; /* Se coloca justo debajo del elemento principal */
+  left: 0;
+  background-color: #34495e;
+  min-width: 180px;
+  flex-direction: column; /* Apila los elementos del submenú verticalmente */
+  box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+}
+
+/* Mostrar el submenú al pasar el cursor */
+.menu-navegacion li:hover .submenu {
+  display: flex;
+}
+
+/* Estilos de los enlaces del submenú */
+.menu-navegacion .submenu li {
+  width: 100%;
+}
+
+.menu-navegacion .submenu a {
+  padding: 12px 20px;
+}
