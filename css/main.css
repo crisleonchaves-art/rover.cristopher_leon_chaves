@@ -16,3 +16,12 @@ img{
 img:hover{
     transform:scale(2.5);
 }
+
+h1 {
+  transition: font-size 0.3s ease; /* Hace que el cambio sea progresivo */
+}
+
+h1:hover {
+  font-size: 3.5rem; /* El tamaño al que quieres que crezca */
+}
+
