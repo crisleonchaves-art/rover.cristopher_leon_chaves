@@ -49,185 +49,47 @@
 </br>
 </br>
 </br>
-<p stile="font-family: monospace; white-space: pre; background-color: #aad188; padding: 10px; border-radius: 5px;"># codigo de rover 1.1v
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Mostrar Código con Estilo</title>
+    
+    <!-- 1. Importar los estilos de colores (tema Darkula/Atom One Dark por ejemplo) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            padding: 20px;
+        }
+        /* Personalización opcional del contenedor del código */
+        pre {
+            border-radius: 8px;
+            padding: 15px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
 
-#librerias del programa
+    <h2>Mi Código de Rover</h2>
 
-# librerias de sensores
+    <!-- 2. Usar <pre><code> para mantener espacios y saltos de línea -->
+    <pre><code class="language-python">
+# codigo de rover 1.1v
 from ideaboard import IdeaBoard
 import board
-import time
-import adafruit_hcsr04
-from time import sleep
-# librerias del wifi
-import ssl
-import socketpool
-import wifi
-import adafruit_minimqtt.adafruit_minimqtt as MQTT
-from adafruit_io.adafruit_io import IO_MQTT
 
-#varieables
 ib = IdeaBoard()
+print("Sistema listo")
+    </code></pre>
 
-entrada = ib.DigitalIn(board.IO32)# sensor de lector de linea
+    <!-- 3. Activar la librería de colores -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
 
-sonar = adafruit_hcsr04.HCSR04(trigger_pin=board.IO18, echo_pin=board.IO19)#sensor de distancia o aproximidadaq
-
-#leds
-ib.brightness = 0.2
-
-BLUE = (0,0,255)#LEFT AND RIGHT
-GREEN = (0,255,0)#FORWARD
-RED = (255,0,0)#STOP
-YELLOW = (255,255,0)#BACK
-
-#si el sitema esta activo
-activo = False
-
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
-
-aio_username = secrets["aio_username"]
-aio_key = secrets["aio_key"]
-
-print("Connecting to %s" % secrets["ssid"])
-wifi.radio.connect(secrets["ssid"], secrets["password"])
-print("Connected to %s!" % secrets["ssid"])
-
-def connected(client):
-    print("Connected to Adafruit IO!  Listening for DemoFeed changes...")
-    client.subscribe("off_on")
-    client.subscribe("line")
-    client.subscribe("distance")
-    client.subscribe("address")
-        
-def subscribe(client, userdata, topic, granted_qos):
-    print("Subscribed to {0} with QOS level {1}".format(topic, granted_qos))
-
-
-def unsubscribe(client, userdata, topic, pid):
-    print("Unsubscribed from {0} with PID {1}".format(topic, pid))
-
-
-def disconnected(client):
-    print("Disconnected from Adafruit IO!")
-
-
-def message(client, feed_id, payload):
-    print(client,feed_id,payload)
-    global activo
-    if feed_id == "off_on"
-        if payload == "ON"
-        activo = True
-        io.publish("ACTIVADO")
-        print("SISTEMA encendidio")
-    elif payload == "OFF":
-        activo = False
-        io.publish("DESACTIVADO")
-        print("SISTEMA APAGADO ")
-        
-
-pool = socketpool.SocketPool(wifi.radio)
-
-# Initialize a new MQTT Client object
-mqtt_client = MQTT.MQTT(
-    broker="io.adafruit.com",
-    port=1883,
-    username=secrets["aio_username"],
-    password=secrets["aio_key"],
-    socket_pool=pool,
-    ssl_context=ssl.create_default_context(),
-)
-
-# Initialize an Adafruit IO MQTT Client
-io = IO_MQTT(mqtt_client)
-
-# Connect the callback methods defined above to Adafruit IO
-io.on_connect = connected
-io.on_disconnect = disconnected
-io.on_subscribe = subscribe
-io.on_unsubscribe = unsubscribe
-io.on_message = message
-
-# Connect to Adafruit IO
-print("Connecting to Adafruit IO...")
-io.connect()
-
-#definir el movimiento
-def avanzar(vel, tiempo):
-    ib.motor_1.throttle = vel
-    ib.motor_2.throttle = vel
-    sleep(tiempo)
-    
-def stop():
-    ib.motor_1.throttle = 0
-    ib.motor_2.throttle = 0
-    print("stop")
-    ib.pixel = RED
-    
-def forward():
-    ib.motor_1.throttle = 0.5
-    ib.motor_2.throttle = 0.5
-    print("forward")
-    ib.pixel = GREEN
-    
-def back():
-    ib.motor_1.throttle = -0.5
-    ib.motor_2.throttle = -0.5
-    print("back")
-    ib.pixel = YELLOW
-
-def left():
-    ib.motor_1.throttle = 0
-    ib.motor_2.throttle = 0.5
-    print("left")
-    ib.print = BLUE
-    
-def right():
-    ib.motor_1.throttle = 0.5
-    ib.motor_2.throttle = 0
-    print("rigth")
-    ib.print = BLUE
-    
-while True:
-    while True:
-    io.loop()
-    if not activo:
-        time.sleep(0.05)
-        continue
-    
-        if ( entrada.value == False):
-        print("adentro de el lugar")
-        io.publish("line", "blanco")
-            try:
-                print((sonar.distance,))
-                io.publish("distance", sonar.distance)
-                if(sonar.distance<7.0):
-                print("alto")
-                back
-                time.sleep(0.3)
-                left
-                sleep(2)
-                
-                if(sonar.distance>=7.0):
-                print("avanzando")
-                forward
-                sleep(2)
-                
-                except RuntimeError:
-                sleep(2)
-                print("error de lectura")
-                time.sleep(0.8)
-    else:
-        print("fuera del lugar")
-        io.publish("line", "negro")
-        back
-        time.sleep(0.5)
-        right
-        time.sleep(0.5)
-    time.sleep(0.8)</p>
-</br>
+</body>
+</html>
 </body>
