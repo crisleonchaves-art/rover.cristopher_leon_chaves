@@ -45,5 +45,220 @@
     </li
   </ul>
 </nav>
+  
+</br>
+</br>
+</br>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>codigo 1.1v</title>
+    
+    <!-- 1. Importar los estilos de colores (tema Darkula/Atom One Dark por ejemplo) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            padding: 20px;
+        }
+        /* Personalización opcional del contenedor del código */
+        pre {
+            border-radius: 8px;
+            padding: 15px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
 
+    <h2>codigo 1.2v</h2>
+
+    <!-- 2. Usar <pre><code> para mantener espacios y saltos de línea -->
+    <pre><code class="language-python">
+# codigo de rover 1.2v
+
+from ideaboard import IdeaBoard
+import board
+import time
+import adafruit_hcsr04
+import ssl
+import socketpool
+import wifi
+import adafruit_minimqtt.adafruit_minimqtt as MQTT
+from adafruit_io.adafruit_io import IO_MQTT
+
+# ---------- Hardware ----------
+ib = IdeaBoard()
+entrada = ib.DigitalIn(board.IO32)  # sensor de línea
+sonar = adafruit_hcsr04.HCSR04(trigger_pin=board.IO18, echo_pin=board.IO19)
+
+ib.brightness = 0.2
+BLUE = (0, 0, 255)     # izquierda / derecha
+GREEN = (0, 255, 0)    # adelante
+RED = (255, 0, 0)      # stop
+YELLOW = (255, 255, 0) # atrás
+
+activo = False
+DIST_MIN = 7.0
+INTERVALO_PUB = 5  # segundos entre publicaciones (límite de Adafruit IO)
+
+# ---------- WiFi ----------
+try:
+    from secrets import secrets
+except ImportError:
+    print("WiFi secrets are kept in secrets.py, please add them there!")
+    raise
+
+print("Connecting to %s" % secrets["ssid"])
+wifi.radio.connect(secrets["ssid"], secrets["password"])
+print("Connected to %s!" % secrets["ssid"])
+
+# ---------- Movimiento ----------
+def stop():
+    ib.motor_1.throttle = 0
+    ib.motor_2.throttle = 0
+    print("stop")
+    ib.pixel = RED
+
+def forward():
+    ib.motor_1.throttle = 0.5
+    ib.motor_2.throttle = 0.5
+    print("forward")
+    ib.pixel = GREEN
+
+def back():
+    ib.motor_1.throttle = -0.5
+    ib.motor_2.throttle = -0.5
+    print("back")
+    ib.pixel = YELLOW
+
+def left():
+    ib.motor_1.throttle = 0
+    ib.motor_2.throttle = 0.5
+    print("left")
+    ib.pixel = BLUE
+
+def right():
+    ib.motor_1.throttle = 0.5
+    ib.motor_2.throttle = 0
+    print("right")
+    ib.pixel = BLUE
+
+# ---------- Callbacks MQTT ----------
+def connected(client):
+    print("Connected to Adafruit IO!")
+    client.subscribe("off_on")
+
+def subscribe(client, userdata, topic, granted_qos):
+    print("Subscribed to {0} with QOS level {1}".format(topic, granted_qos))
+
+def unsubscribe(client, userdata, topic, pid):
+    print("Unsubscribed from {0} with PID {1}".format(topic, pid))
+
+def disconnected(client):
+    print("Disconnected from Adafruit IO!")
+
+def message(client, feed_id, payload):
+    global activo
+    print(feed_id, payload)
+    if feed_id == "off_on":
+        if payload == "ON":
+            activo = True
+            io.publish("status", "ACTIVADO")
+            print("SISTEMA ENCENDIDO")
+        elif payload == "OFF":
+            activo = False
+            stop()
+            io.publish("status", "DESACTIVADO")
+            print("SISTEMA APAGADO")
+
+pool = socketpool.SocketPool(wifi.radio)
+mqtt_client = MQTT.MQTT(
+    broker="io.adafruit.com",
+    port=1883,
+    username=secrets["aio_username"],
+    password=secrets["aio_key"],
+    socket_pool=pool,
+    ssl_context=ssl.create_default_context(),
+)
+
+io = IO_MQTT(mqtt_client)
+io.on_connect = connected
+io.on_disconnect = disconnected
+io.on_subscribe = subscribe
+io.on_unsubscribe = unsubscribe
+io.on_message = message
+
+print("Connecting to Adafruit IO...")
+io.connect()
+stop()
+
+# ---------- Bucle principal ----------
+ultimo_pub = 0
+
+while True:
+    # Mantener MQTT vivo, con reconexión si falla
+    try:
+        io.loop()
+    except (RuntimeError, OSError) as e:
+        print("Error MQTT:", e)
+        try:
+            io.reconnect()
+        except Exception as e2:
+            print("No se pudo reconectar:", e2)
+        time.sleep(1)
+        continue
+
+    if not activo:
+        time.sleep(0.05)
+        continue
+
+    # Una sola lectura del sonar por ciclo
+    try:
+        distancia = sonar.distance
+    except RuntimeError:
+        print("error de lectura")
+        time.sleep(0.2)
+        continue
+
+    dentro = not entrada.value  # False = blanco = dentro del lugar
+
+    # Publicar con límite de frecuencia
+    ahora = time.monotonic()
+    if ahora - ultimo_pub >= INTERVALO_PUB:
+        io.publish("line", "blanco" if dentro else "negro")
+        io.publish("distance", distancia)
+        ultimo_pub = ahora
+
+    if dentro:
+        print("adentro del lugar", distancia)
+        if distancia < DIST_MIN:
+            print("alto")
+            back()
+            time.sleep(0.3)
+            left()
+            time.sleep(1)
+        else:
+            print("avanzando")
+            forward()
+    else:
+        print("fuera del lugar")
+        back()
+        time.sleep(0.5)
+        right()
+        time.sleep(0.5)
+
+    time.sleep(0.1)
+    </code></pre>
+
+    <!-- 3. Activar la librería de colores -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+
+</body>
+</html>
+</body>
 </body>
