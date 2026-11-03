@@ -9,7 +9,7 @@ div-img-base{
     justify-content: center;
     align-items: center;
     display:flex;
-    padding-top:5%;
+    padding-top:20%;
 }
 img{
     transition: transform .2s;
@@ -21,7 +21,7 @@ img{
     border: 1px solid black;
 }
 img:hover{
-    transform:scale(2.5);
+    transform:scale(1.5);
 }
 
 h1 {
