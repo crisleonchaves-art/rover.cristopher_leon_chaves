@@ -4,6 +4,13 @@ div-img{
     display:flex;
     padding-top:20%;
 }
+
+div-img-base{
+    justify-content: center;
+    align-items: center;
+    display:flex;
+    padding-top:5%;
+}
 img{
     transition: transform .2s;
     width:300px;
