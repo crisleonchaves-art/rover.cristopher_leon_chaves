@@ -77,12 +77,254 @@
 <p>optimizado pero no contiene esta bien escritos los pines</p>
     <!-- 2. Usar <pre><code> para mantener espacios y saltos de línea -->
     <pre><code class="language-python">
-# codigo de rover 1.1v
-from ideaboard import IdeaBoard
+#code 1.5v
+import ssl
+import time
 import board
+import socketpool
+import wifi
+import adafruit_hcsr04
+import adafruit_minimqtt.adafruit_minimqtt as MQTT
+from adafruit_io.adafruit_io import IO_MQTT
+from ideaboard import IdeaBoard
+
+VELOCIDAD = 0.5
+DISTANCIA_MIN = 20.0
+INTERVALO_LOOP = 0.05
+INTERVALO_LECTURA = 0.15
+INTERVALO_DISTANCIA = 5.0
 
 ib = IdeaBoard()
-print("Sistema listo")
+ib.brightness = 0.2
+
+entrada = ib.DigitalIn(board.IO32)
+sonar = adafruit_hcsr04.HCSR04(
+    trigger_pin=board.IO18,
+    echo_pin=board.IO19
+)
+
+BLUE = (0, 0, 255)
+GREEN = (0, 255, 0)
+RED = (255, 0, 0)
+YELLOW = (255, 255, 0)
+
+def mover(motor1, motor2, color, nombre):
+    ib.motor_1.throttle = motor1
+    ib.motor_2.throttle = motor2
+    ib.pixel = color
+    print(nombre)
+
+def stop():
+    mover(0, 0, RED, "stop")
+
+def forward():
+    mover(VELOCIDAD, VELOCIDAD, GREEN, "forward")
+
+def back():
+    mover(-VELOCIDAD, -VELOCIDAD, YELLOW, "back")
+
+def left():
+    mover(-VELOCIDAD, VELOCIDAD, BLUE, "left")
+
+def right():
+    mover(VELOCIDAD, -VELOCIDAD, BLUE, "right")
+
+try:
+    from secrets import secrets
+except ImportError:
+    raise
+
+wifi.radio.connect(secrets["ssid"], secrets["password"])
+
+activo = False
+maniobra = []
+paso_fin = 0.0
+giro = 1
+
+ultima_distancia = 100.0
+ultima_lectura = 0.0
+ultima_publicacion = 0.0
+ultima_linea = None
+ultima_orden = None
+
+def iniciar_maniobra(pasos):
+    global maniobra
+    maniobra = list(pasos)
+    siguiente_paso(time.monotonic())
+
+def siguiente_paso(ahora):
+    global paso_fin
+    if maniobra:
+        accion, duracion = maniobra.pop(0)
+        accion()
+        paso_fin = ahora + duracion
+    else:
+        paso_fin = ahora
+
+def cancelar_maniobra():
+    global maniobra
+    maniobra.clear()
+
+def connected(client):
+    print("Adafruit IO conectado")
+    client.subscribe("off_on")
+
+def disconnected(client):
+    print("Desconectado de Adafruit IO")
+
+def subscribe(client, userdata, topic, granted_qos):
+    print("Suscrito:", topic)
+
+def message(client, feed_id, payload):
+    global activo
+    global ultima_orden
+
+    if feed_id != "off_on":
+        return
+
+    comando = payload.strip().upper()
+
+    if comando == "ON" and not activo:
+        activo = True
+        ultima_orden = None
+        io.publish("estado", "ACTIVADO")
+        print("SISTEMA ENCENDIDO")
+
+    elif comando == "OFF":
+        activo = False
+        cancelar_maniobra()
+        stop()
+        io.publish("estado", "DESACTIVADO")
+        print("SISTEMA APAGADO")
+
+pool = socketpool.SocketPool(wifi.radio)
+
+mqtt_client = MQTT.MQTT(
+    broker="io.adafruit.com",
+    port=1883,
+    username=secrets["aio_username"],
+    password=secrets["aio_key"],
+    socket_pool=pool,
+    ssl_context=ssl.create_default_context()
+)
+
+io = IO_MQTT(mqtt_client)
+io.on_connect = connected
+io.on_disconnect = disconnected
+io.on_subscribe = subscribe
+io.on_message = message
+
+io.connect()
+
+def reconectar():
+    global activo
+    activo = False
+    cancelar_maniobra()
+    stop()
+
+    try:
+        if not wifi.radio.connected:
+            wifi.radio.connect(
+                secrets["ssid"],
+                secrets["password"]
+            )
+        io.reconnect()
+        print("Reconectado")
+    except Exception as e:
+        print("Error:", e)
+        time.sleep(2)
+
+def leer_distancia():
+    global ultima_distancia
+    global ultima_lectura
+
+    ahora = time.monotonic()
+
+    if ahora - ultima_lectura >= INTERVALO_LECTURA:
+        ultima_lectura = ahora
+
+        try:
+            ultima_distancia = sonar.distance
+        except RuntimeError:
+            ultima_distancia = 0
+
+    return ultima_distancia
+
+def publicar_linea(valor):
+    global ultima_linea
+
+    if valor != ultima_linea:
+        io.publish("line", valor)
+        ultima_linea = valor
+
+def publicar_distancia(valor, ahora):
+    global ultima_publicacion
+
+    if ahora - ultima_publicacion >= INTERVALO_DISTANCIA:
+        io.publish("distance", valor)
+        ultima_publicacion = ahora
+
+stop()
+
+while True:
+    ahora = time.monotonic()
+
+    try:
+        io.loop()
+    except (MQTT.MMQTTException, OSError, RuntimeError) as e:
+        print("Error de conexion:", e)
+        reconectar()
+        continue
+
+    if not activo:
+        time.sleep(INTERVALO_LOOP)
+        continue
+
+    try:
+        if maniobra or ahora < paso_fin:
+            if ahora >= paso_fin:
+                siguiente_paso(ahora)
+
+            time.sleep(INTERVALO_LOOP)
+            continue
+
+        negro = entrada.value
+        distancia = leer_distancia()
+
+        if negro:
+            publicar_linea("negro")
+            cancelar_maniobra()
+
+            giro *= -1
+
+            iniciar_maniobra([
+                (back, 0.45),
+                (right if giro > 0 else left, 0.65)
+            ])
+
+        elif distancia < DISTANCIA_MIN:
+            publicar_linea("blanco")
+
+            giro *= -1
+
+            iniciar_maniobra([
+                (back, 0.4),
+                (right if giro > 0 else left, 0.8)
+            ])
+
+        else:
+            publicar_linea("blanco")
+            forward()
+
+        publicar_distancia(distancia, ahora)
+
+    except (MQTT.MMQTTException, OSError) as e:
+        print("Error:", e)
+        reconectar()
+        continue
+
+    time.sleep(INTERVALO_LOOP)
+
     </code></pre>
 
     <!-- 3. Activar la librería de colores -->
