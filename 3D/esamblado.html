@@ -45,5 +45,23 @@
     </li
   </ul>
 </nav>
-  
+<h2>asamblaje</h2>
+<br>
+<br>
+  <img id="foto" src="imagenes/img1.jpg" width="400">
+
+<script>
+  var fotos = [
+    "imagenes/img1.jpg",
+    "imagenes/img2.jpg",
+    "imagenes/img3.jpg"
+  ];
+  var i = 0;
+
+  setInterval(function () {
+    i = i + 1;
+    if (i == fotos.length) i = 0;
+    document.getElementById("foto").src = fotos[i];
+  }, 3000);
+</script>
 </body>
