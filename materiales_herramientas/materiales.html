@@ -2,8 +2,41 @@
 <head>
 <link rel="stylesheet" href="../css/main.css">
 <title>materiales</title>
+<style>
+  .btn-descarga {
+    display: inline-block;
+    padding: 12px 24px;
+    background-color: #007bff;
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 6px;
+    font-family: sans-serif;
+    font-weight: bold;
+    text-align: center;
+    transition: background-color 0.2s ease;
+  }
+  
+  .btn-descarga:hover {
+    background-color: #0056b3;
+  }
+
+  /* Estilos básicos opcionales para que la tabla se vea ordenada */
+  .table table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    font-family: sans-serif;
+  }
+  .table th, .table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  .table th {
+    background-color: #f2f2f2;
+  }
+</style>
 </head>
-</html>
 <body>
 <nav class="menu-navegacion">
   <ul>
@@ -50,108 +83,92 @@
   </ul>
 </nav>
 
-  </br>
-</br>
-</br>
-<h2>BASE DEL ROVER</h2>
-  <a href="../documentos/materiales.xlsx" download="materiales.xlsx" class="btn-descarga">
+<br><br><br>
+<h2>materiales</h2>
+<a href="../documentos/materiales.xlsx" download="materiales.xlsx" class="btn-descarga">
    Descarga documento exel
-  </a>
-<style>
-  .btn-descarga {
-    display: inline-block;
-    padding: 12px 24px;
-    background-color: #007bff;
-    color: #ffffff;
-    text-decoration: none;
-    border-radius: 6px;
-    font-family: sans-serif;
-    font-weight: bold;
-    text-align: center;
-    transition: background-color 0.2s ease;
-  }
-  
-  .btn-descarga:hover {
-    background-color: #0056b3;
-  }
-  </br>
-  </br>
+</a>
+
+<br><br>
+
 <div class="table">
   <table>
     <tr>
-    <th>hardware</th>
-    <th>cantidad</th>
-    <th>precio</th>
-    <th>sitio</th>
-    <th>total</th>
-  </tr>
-
-  <tr>
-    <td>llantas</td>
-    <td>2 pares</td>
-    <td>$2.5</td>
-    <td>https://crcibernetica.com/70mm-wheel-1-pair-works-with-dg01d-gearmotors/</td>
-    <td>$5</td>
-  </tr>
-   <tr>
-    <td>sensor HYSRF-05</td>
-    <td>1</td>
-    <td>$4.5</td>
-    <td>https://crcibernetica.com/hc-sr05-ultrasonic-distance-sensor/</td>
-    <td>$4,5</td>
-  </tr>
-  <tr>
-    <td>sensor IR</td>
-    <td>1</td>
-    <td><$1.90/td>
-    <td>https://crcibernetica.com/track-sensor-module/</td>
-    <td>$1.90</td>
-  </tr>
-     <tr>
-    <td>porta pilas 4 AA</td>
-    <td>1</td>
-    <td><$2.25/td>
-    <td>https://crcibernetica.com/battery-holder-4xaa-square/</td>
-    <td>$2.25</td>
-  </tr>
-  <tr>
-    <td>motor dc</td>
-    <td>4</td>
-    <td>$1.25</td>
-    <td>https://crcibernetica.com/small-dc-motor-4-5-6v/</td>
-    <td>$5</td>
-  </tr>
-  <tr>
-    <td>IdeaBoard</td>
-    <td>1</td>
-    <td>$29.95</td>
-    <td>https://crcibernetica.com/crcibernetica-ideaboard/</td>
-    <td>$29.95</td>
-  </tr>
-  <tr>
-    <td>ejes 3d</td>
-    <td>4</td>
-    <td>$2,66</td>
-    <td>https://acro3dprint.com/</td>
-    <td>$10,63</td>
-  </tr>
-  <tr>
-    <td>base 3d</td>
-    <td>1</td>
-    <td>$30-$40</td>
-    <td>https://acro3dprint.com/</td>
-    <td>$30-$40</td>
-  </tr>
+      <th>hardware</th>
+      <th>cantidad</th>
+      <th>precio</th>
+      <th>sitio</th>
+      <th>total</th>
+    </tr>
     <tr>
-  <th>            </th>
-    <th>dolar</th>
-    <th>colon</th>
-  </tr>
-  <tr>
-    <th>total</th>
-    <td>$89.23-$100</td>
-    <td>₡40 275,68</td>
-  </tr>
-</table>  
+      <td>llantas</td>
+      <td>2 pares</td>
+      <td>$2.5</td>
+      <td>https://crcibernetica.com/70mm-wheel-1-pair-works-with-dg01d-gearmotors/</td>
+      <td>$5</td>
+    </tr>
+    <tr>
+      <td>sensor HYSRF-05</td>
+      <td>1</td>
+      <td>$4.5</td>
+      <td>https://crcibernetica.com/hc-sr05-ultrasonic-distance-sensor/</td>
+      <td>$4.5</td>
+    </tr>
+    <tr>
+      <td>sensor IR</td>
+      <td>1</td>
+      <td>$1.90</td>
+      <td>https://crcibernetica.com/track-sensor-module/</td>
+      <td>$1.90</td>
+    </tr>
+    <tr>
+      <td>porta pilas 4 AA</td>
+      <td>1</td>
+      <td>$2.25</td>
+      <td>https://crcibernetica.com/battery-holder-4xaa-square/</td>
+      <td>$2.25</td>
+    </tr>
+    <tr>
+      <td>motor dc</td>
+      <td>4</td>
+      <td>$1.25</td>
+      <td>https://crcibernetica.com/small-dc-motor-4-5-6v/</td>
+      <td>$5</td>
+    </tr>
+    <tr>
+      <td>IdeaBoard</td>
+      <td>1</td>
+      <td>$29.95</td>
+      <td>https://crcibernetica.com/crcibernetica-ideaboard/</td>
+      <td>$29.95</td>
+    </tr>
+    <tr>
+      <td>ejes 3d</td>
+      <td>4</td>
+      <td>$2.66</td>
+      <td>https://acro3dprint.com/</td>
+      <td>$10.63</td>
+    </tr>
+    <tr>
+      <td>base 3d</td>
+      <td>1</td>
+      <td>$30-$40</td>
+      <td>https://acro3dprint.com/</td>
+      <td>$30-$40</td>
+    </tr>
+    <tr>
+      <th></th>
+      <th>dolar</th>
+      <th>colon</th>
+      <th colspan="2"></th>
+    </tr>
+    <tr>
+      <th>total</th>
+      <td>$89.23-$100</td>
+      <td>₡40 275,68</td>
+      <td colspan="2"></td>
+    </tr>
+  </table>  
 </div>
 </body>
+</html>
