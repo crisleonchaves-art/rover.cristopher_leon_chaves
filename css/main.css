@@ -166,21 +166,22 @@ table tr:hover {
     background: #e3f2fd;
 }
 
-  .imagen-movimiento {
+ .imagen-movimiento {
     position: fixed;
     right: 0;
     top: 50%;
     transform: translateY(-50%);
-    width: 50%;
+    width: 50vw;
     text-align: center;
-    background: none;      /* sin fondo gris */
-    pointer-events: none;  /* no bloquea clics en nada que quede debajo */
+    pointer-events: none;
   }
 
   .imagen-movimiento img {
-    max-width: 90%;
-    max-height: 70vh;
+    width: 90% !important;
+    height: auto !important;
+    max-width: none !important;
+    max-height: 90vh !important;
     object-fit: contain;
-    background: none;      /* quita el fondo morado */
-    border: none;          /* quita el borde */
+    background: none !important;
+    border: none !important;
   }
