@@ -93,26 +93,42 @@ import adafruit_minimqtt.adafruit_minimqtt as MQTT
 from adafruit_io.adafruit_io import IO_MQTT
 from ideaboard import IdeaBoard
 
+# ---------------------------------------------------------------
+# CONFIGURACION
+# ---------------------------------------------------------------
 VELOCIDAD = 0.5
-DISTANCIA_MIN = 20.0       
-DISTANCIA_LIBRE = 400.0  
-FALLOS_PARA_LIBRE = 3    
+DISTANCIA_MIN = 20.0       # cm: menos que esto = obstaculo
+DISTANCIA_LIBRE = 400.0    # cm: valor usado cuando el sonar no recibe eco
+FALLOS_PARA_LIBRE = 3      # lecturas fallidas seguidas para asumir camino libre
 INTERVALO_LOOP = 0.05
 INTERVALO_LECTURA = 0.15
 INTERVALO_DISTANCIA = 5.0
 
+# Claves (keys) de los feeds en Adafruit IO. Los feeds dentro de un grupo
+# llevan el prefijo "grupo.": el feed "off_on" del grupo "rover" es "rover.off-on".
+# (Las claves no admiten guion bajo.)
+FEED_ONOFF = "rover.off-on"
+FEED_ESTADO = "rover.estado"
+FEED_LINEA = "rover.line"
+FEED_DISTANCIA = "rover.distance"
 
+# ---------------------------------------------------------------
+# HARDWARE
+# ---------------------------------------------------------------
 ib = IdeaBoard()
 ib.brightness = 0.2
 
-entrada = ib.DigitalIn(board.IO04)  # True = negro (fuera), False = blanco (dentro)
-sonar = adafruit_hcsr04.HCSR04(trigger_pin=board.IO18, echo_pin=board.IO19)
+entrada = ib.DigitalIn(board.IO32)  # True = negro (fuera), False = blanco (dentro)
+sonar = adafruit_hcsr04.HCSR04(trigger_pin=board.IO19, echo_pin=board.IO18)
 
 BLUE = (0, 0, 255)
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 YELLOW = (255, 255, 0)
 
+# ---------------------------------------------------------------
+# MOVIMIENTO
+# ---------------------------------------------------------------
 estado_actual = None
 
 
@@ -148,6 +164,9 @@ def right():
     mover(VELOCIDAD, -VELOCIDAD, BLUE, "right")
 
 
+# ---------------------------------------------------------------
+# WIFI
+# ---------------------------------------------------------------
 try:
     from secrets import secrets
 except ImportError:
@@ -156,7 +175,9 @@ except ImportError:
 
 wifi.radio.connect(secrets["ssid"], secrets["password"])
 
-
+# ---------------------------------------------------------------
+# ESTADO
+# ---------------------------------------------------------------
 activo = False
 maniobra = []
 paso_fin = 0.0
@@ -188,9 +209,12 @@ def cancelar_maniobra():
     maniobra.clear()
 
 
+# ---------------------------------------------------------------
+# ADAFRUIT IO (MQTT)
+# ---------------------------------------------------------------
 def connected(client):
     print("Adafruit IO conectado")
-    client.subscribe("off_on")
+    client.subscribe(FEED_ONOFF)
 
 
 def disconnected(client):
@@ -204,21 +228,21 @@ def subscribe(client, userdata, topic, granted_qos):
 def message(client, feed_id, payload):
     global activo
 
-    if feed_id != "off_on":
+    if feed_id != FEED_ONOFF:
         return
 
     comando = payload.strip().upper()
 
     if comando == "ON" and not activo:
         activo = True
-        io.publish("estado", "ACTIVADO")
+        io.publish(FEED_ESTADO, "ACTIVADO")
         print("SISTEMA ENCENDIDO")
 
     elif comando == "OFF":
         activo = False
         cancelar_maniobra()
         stop()
-        io.publish("estado", "DESACTIVADO")
+        io.publish(FEED_ESTADO, "DESACTIVADO")
         print("SISTEMA APAGADO")
 
 
@@ -257,6 +281,10 @@ def reconectar():
         print("Error:", e)
         time.sleep(2)
 
+
+# ---------------------------------------------------------------
+# SENSORES
+# ---------------------------------------------------------------
 def leer_distancia(ahora):
     """
     Devuelve la distancia en cm.
@@ -283,7 +311,7 @@ def leer_distancia(ahora):
 def publicar_linea(valor):
     global ultima_linea
     if valor != ultima_linea:
-        io.publish("line", valor)
+        io.publish(FEED_LINEA, valor)
         ultima_linea = valor
 
 
@@ -291,9 +319,13 @@ def publicar_distancia(valor, ahora):
     """Solo publica lecturas reales, como maximo cada INTERVALO_DISTANCIA s."""
     global ultima_publicacion
     if lectura_valida and ahora - ultima_publicacion >= INTERVALO_DISTANCIA:
-        io.publish("distance", valor)
+        io.publish(FEED_DISTANCIA, valor)
         ultima_publicacion = ahora
 
+
+# ---------------------------------------------------------------
+# BUCLE PRINCIPAL
+# ---------------------------------------------------------------
 stop()
 
 while True:
@@ -311,15 +343,18 @@ while True:
         continue
 
     try:
+        # 1) Esperar a que termine el paso actual de la maniobra
         if ahora < paso_fin:
             time.sleep(INTERVALO_LOOP)
             continue
 
+        # 2) Pasar al siguiente paso si queda alguno
         if maniobra:
             siguiente_paso(ahora)
             time.sleep(INTERVALO_LOOP)
             continue
 
+        # 3) Decidir segun los sensores
         negro = entrada.value
         distancia = leer_distancia(ahora)
 
@@ -351,7 +386,6 @@ while True:
         continue
 
     time.sleep(INTERVALO_LOOP)
-
     </code></pre>
 
     <!-- 3. Activar la librería de colores -->
