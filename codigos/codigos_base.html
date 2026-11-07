@@ -1,0 +1,362 @@
+<html>
+<head>
+<link rel="stylesheet" href="../css/main.css">
+<title>codigo 1.1v</title>
+</head>
+</html>
+<body>
+<nav class="menu-navegacion">
+  <ul>
+    <li><a href="https://crisleonchaves-art.github.io/rover.cristopher_leon_chaves/">Inicio</a></li>
+    <li><a href="#">diseños 3d</a>
+      <ul class="submenu">
+        <li><a href="../3D/base_rover.html">base de rover</a></li>
+        <li><a href="../3D/eje_motor.html">ejes de el motor</a></li>
+      </ul>
+    </li>
+    <li><a href="#">codigos</a>
+      <ul class="submenu">
+        <li><a href="../codigos/1_1v.html">1.1v</a></li>
+        <li><a href="../codigos/1_2v.html">1.2v</a></li>
+        <li><a href="../codigos/1_3v.html">1.3v</a></li>
+        <li><a href="../codigos/1_4v.html">1.4v</a></li>
+        <li><a href="../codigos/1_5v.html">1.5v</a></li>
+        <li><a href="../codigos/1_6v.html">1.6v</a></li>
+        <li><a href="../codigos/secrets.html">secrets</a></li>
+        <li><a href="../codigos/codigos_base.html">codigos base</a></li>
+      </ul>
+    </li>
+    <li><a href="#">circuito</a>
+      <ul class="submenu">
+        <li><a href="../circuito/circuito.html">circuito</a></li>
+      </ul>
+    </li>
+    <li><a href="#">materiale e herramientas</a>
+      <ul class="submenu">
+        <li><a href="../materiales_herramientas/materiales.html">materiales</a></li>
+        <li><a href="../materiales_herramientas/herramientas.html">herramientas</a></li>
+      </ul>
+    </li>
+    <li><a href="#">dashboard</a>
+      <ul class="submenu">
+        <li><a href="https://io.adafruit.com/tibumba2011/dashboards/rover">adafruit io</a></li>
+       <li><a href="../dasboard.html">claude(recomendado)</a></li>
+      </ul>
+    </li>
+    <li><a href="#">conclusion</a>
+      <ul class="submenu">
+        <li><a href="../3D/esamblado.html">conclusiones</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+</br>
+</br>
+</br>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>codigo base</title>
+    <!-- 1. Importar los estilos de colores (tema Darkula/Atom One Dark por ejemplo) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            padding: 20px;
+        }
+        /* Personalización opcional del contenedor del código */
+        pre {
+            border-radius: 8px;
+            padding: 15px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>codigo basev</h2>
+    <h3>codigo motor</h3>
+    <!-- 2. Usar <pre><code> para mantener espacios y saltos de línea -->
+    <pre><code class="language-python">
+from ideaboard import IdeaBoard
+
+ib = IdeaBoard()
+
+# motor speed is from -1.0 (reverse) to 1.0 (forward)
+# 0 is stopped with brake, None = roll freely
+ib.motor_1.throttle = 1.0
+ib.motor_2.throttle = -1.0
+    </code></pre>
+
+    <!-- 3. Activar la librería de colores -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+  
+    <h3>codigo sensor ir</h3>
+    <!-- 2. Usar <pre><code> para mantener espacios y saltos de línea -->
+    <pre><code class="language-python">
+import board
+import time
+from ideaboard import IdeaBoard
+
+ib = IdeaBoard()
+
+#Digital In
+# entrada = ib.DigitalIn(board.IO4, pull=ib.UP)
+# pull can be ib.UP or ib.DOWN, default None)
+entrada = ib.DigitalIn(board.IO4)
+while True:
+    if ( entrada.value == True):
+        print("Fuera de línea")
+    else:
+        print("En línea")
+    time.sleep(0.8)
+    </code></pre>
+
+    <!-- 3. Activar la librería de colores -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+
+      <h3>codigo sensor de distancia</h3>
+    <!-- 2. Usar <pre><code> para mantener espacios y saltos de línea -->
+    <pre><code class="language-python">
+# SPDX-FileCopyrightText: 2021ladyada for Adafruit Industries
+# SPDX-License-Identifier- MIT
+
+import time
+import board
+import adafruit_hcsr04
+from time import sleep
+#from Ideaboard import Ideaboard
+
+
+#ib = IdeaBoard()
+
+
+sonar = adafruit_hcsr04.HCSR04(trigger_pin=board.IO18, echo_pin=board.IO19)
+
+while True:
+    try:
+        print((sonar.distance,))
+        if(sonar.distance<15.0):
+            print("alto")
+            sleep(2)
+        if(sonar.distance>=15.0):
+            print("avanzando")
+            sleep(2)
+    except RuntimeError:
+            sleep(2)
+            print("error de lectura")
+            time.sleep(0.8)
+    </code></pre>
+
+    <!-- 3. Activar la librería de colores -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+
+        <h3>led</h3>
+    <!-- 2. Usar <pre><code> para mantener espacios y saltos de línea -->
+    <pre><code class="language-python">
+from ideaboard import IdeaBoard
+
+ib = IdeaBoard()
+
+# Set brightness from 0.0 to 1.0
+ib.brightness = 0.2
+
+# colors are RGB (Red, Green, Blue)
+BLUE = (0,0,255)
+GREEN = (0,255,0)
+RED = (255,0,0)
+PURPLE = (255,0,255)
+YELLOW = (255,255,0)
+
+ib.pixel = BLUE
+    </code></pre>
+
+    <!-- 3. Activar la librería de colores -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+
+          <h3>wifi</h3>
+    <!-- 2. Usar <pre><code> para mantener espacios y saltos de línea -->
+    <pre><code class="language-python">
+# SPDX-FileCopyrightText: 2021 ladyada for Adafruit Industries
+# SPDX-License-Identifier: MIT
+from random import randint
+import ssl
+import socketpool
+import wifi
+import adafruit_minimqtt.adafruit_minimqtt as MQTT
+from adafruit_io.adafruit_io import IO_MQTT
+from ideaboard import IdeaBoard
+import time
+import board
+import adafruit_dht
+from time import sleep
+
+dhtDevice = adafruit_dht.DHT11(board.IO26)
+
+ib = IdeaBoard()
+
+AZUL = (0,0,255)
+VERDE = (0,255,0)
+ROJO = (255,0,0)
+NEGRO = (0,0,0)
+### WiFi ###
+
+ib.arcoiris = 70
+   
+
+# Add a secrets.py to your filesystem that has a dictionary called secrets with "ssid" and
+# "password" keys with your WiFi credentials. DO NOT share that file or commit it into Git or other
+# source control.
+# pylint: disable=no-name-in-module,wrong-import-order
+try:
+    from secrets import secrets
+except ImportError:
+    print("WiFi secrets are kept in secrets.py, please add them there!")
+    raise
+
+# Set your Adafruit IO Username and Key in secrets.py
+# (visit io.adafruit.com if you need to create an account,
+# or if you need your Adafruit IO key.)
+aio_username = secrets["aio_username"]
+aio_key = secrets["aio_key"]
+
+print("Connecting to %s" % secrets["ssid"])
+wifi.radio.connect(secrets["ssid"], secrets["password"])
+print("Connected to %s!" % secrets["ssid"])
+
+# Define callback functions which will be called when certain events happen.
+# pylint: disable=unused-argument
+def connected(client):
+    # Connected function will be called when the client is connected to Adafruit IO.
+    # This is a good place to subscribe to feed changes.  The client parameter
+    # passed to this function is the Adafruit IO MQTT client so you can make
+    # calls against it easily.
+    print("Connected to Adafruit IO!  Listening for DemoFeed changes...")
+    # Subscribe to changes on a feed named DemoFeed.
+    client.subscribe("DemoFeed")
+    client.subscribe("led")
+    client.subscribe("color")
+    client.subscribe("temp")
+    client.subscribe("humid")
+
+def subscribe(client, userdata, topic, granted_qos):
+    # This method is called when the client subscribes to a new feed.
+    print("Subscribed to {0} with QOS level {1}".format(topic, granted_qos))
+
+
+def unsubscribe(client, userdata, topic, pid):
+    # This method is called when the client unsubscribes from a feed.
+    print("Unsubscribed from {0} with PID {1}".format(topic, pid))
+
+
+# pylint: disable=unused-argument
+def disconnected(client):
+    # Disconnected function will be called when the client disconnects.
+    print("Disconnected from Adafruit IO!")
+
+
+# pylint: disable=unused-argument
+def message(client, feed_id, payload):
+    # Message function will be called when a subscribed feed has a new value.
+    # The feed_id parameter identifies the feed, and the payload parameter has
+    # the new value.
+    #print("Feed {0} received new value: {1}".format(feed_id, payload))
+    print(client,feed_id,payload)
+    if feed_id == "led" and payload == "ON":
+        ib.pixel = AZUL
+    if feed_id and payload == "OFF":
+        ib.pixel = NEGRO
+    if feed_id == "color":
+        ib.arcoiris = int(payload)
+  
+    #if feed_id == "temp":
+        #ib.dht11 = int(payload)
+   
+# Create a socket pool
+pool = socketpool.SocketPool(wifi.radio)
+
+# Initialize a new MQTT Client object
+mqtt_client = MQTT.MQTT(
+    broker="io.adafruit.com",
+    port=1883,
+    username=secrets["aio_username"],
+    password=secrets["aio_key"],
+    socket_pool=pool,
+    ssl_context=ssl.create_default_context(),
+)
+
+# Initialize an Adafruit IO MQTT Client
+io = IO_MQTT(mqtt_client)
+
+# Connect the callback methods defined above to Adafruit IO
+io.on_connect = connected
+io.on_disconnect = disconnected
+io.on_subscribe = subscribe
+io.on_unsubscribe = unsubscribe
+io.on_message = message
+
+# Connect to Adafruit IO
+print("Connecting to Adafruit IO...")
+io.connect()
+
+# Below is an example of manually publishing a new  value to Adafruit IO.
+last = 0
+print("Publishing a new message every 2 minutes...")
+while True:
+    # Explicitly pump the message loop.
+    io.loop()
+    # Send a new message every 10 seconds.
+    if (time.monotonic() - last) >= 120:
+        value = randint(0, 100)
+        if value <= 20:
+            #ib.motor_1.throttle = 1.0
+            #ib.motor_2.throttle = 1.0
+            time.sleep(0.1)
+        else:
+            ib.motor_1.throttle = 0
+            ib.motor_2.throttle = 0
+        print("Publishing {0} to DemoFeed.".format(value))
+        io.publish("DemoFeed", value)
+        try:
+        # Print the values to the serial port
+            temperature_c = dhtDevice.temperature
+            temperature_f = temperature_c * (9 / 5) + 32
+            humidity = dhtDevice.humidity
+            print("Publishing {0} to temp.".format(temperature_c))
+            print("Publishing {0} to humidity.".format(humidity))
+            io.publish("temp", temperature_c)
+            io.publish("humid", humidity)
+            print(
+                "Temp: {:.1f} F / {:.1f} C    Humidity: {}% ".format(
+                    temperature_f, temperature_c, humidity
+                )
+            )
+            time.sleep(2.0)
+
+        except RuntimeError as error:
+        # Errors happen fairly often, DHT's are hard to read, just keep going
+            print(error.args[0])
+            time.sleep(2.0)
+            continue
+        except Exception as error:
+            dhtDevice.exit()
+            raise error
+      
+            time.sleep(2.0)
+    </code></pre>
+
+    <!-- 3. Activar la librería de colores -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+
+</body>
+</html>
+</body>
